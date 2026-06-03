@@ -7,16 +7,12 @@ export interface CreatePersonDto {
   weight: string;
   distinctiveFeatures: string;
   consciousnessLevel: ConsciousnessLevel;
-  location?: string;
-  institution: string;
-  dateOfAdmission: string;
-  reportedBy?: string;
-  assignedTo?: string;
   notes?: string;
 }
 
 export interface UpdatePersonDto extends Partial<CreatePersonDto> {
   status?: PersonStatus;
+  assignedTo?: string;
 }
 
 export interface PersonFilters {

@@ -4,8 +4,16 @@
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:3000/api", "type": "string" },
-    { "key": "token",   "value": "",                          "type": "string" }
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3001/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
   ],
   "item": [
     {
@@ -13,7 +21,10 @@
       "item": [
         {
           "name": "Health Check",
-          "request": { "method": "GET", "url": "{{baseUrl}}/health" }
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/health"
+          }
         }
       ]
     },
@@ -22,39 +33,98 @@
       "item": [
         {
           "name": "Login - Dr. Carlos (Italiano)",
-          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["const r = pm.response.json(); if (r.result && r.data?.token) pm.collectionVariables.set('token', r.data.token);"] } }],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const r = pm.response.json(); if (r.result && r.data?.token) pm.collectionVariables.set('token', r.data.token);"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{baseUrl}}/auth/login",
-            "body": { "mode": "raw", "raw": "{\n  \"email\": \"carlos.mendez@italiano.org.ar\",\n  \"password\": \"test\"\n}" }
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"carlos.mendez@italiano.org.ar\",\n  \"password\": \"test\"\n}"
+            }
           }
         },
         {
           "name": "Login - Enf. Laura (Italiano)",
-          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["const r = pm.response.json(); if (r.result && r.data?.token) pm.collectionVariables.set('token', r.data.token);"] } }],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const r = pm.response.json(); if (r.result && r.data?.token) pm.collectionVariables.set('token', r.data.token);"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{baseUrl}}/auth/login",
-            "body": { "mode": "raw", "raw": "{\n  \"email\": \"laura.garcia@italiano.org.ar\",\n  \"password\": \"test\"\n}" }
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"laura.garcia@italiano.org.ar\",\n  \"password\": \"test\"\n}"
+            }
           }
         },
         {
           "name": "Login - Lic. Sofia (Aleman)",
-          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["const r = pm.response.json(); if (r.result && r.data?.token) pm.collectionVariables.set('token', r.data.token);"] } }],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const r = pm.response.json(); if (r.result && r.data?.token) pm.collectionVariables.set('token', r.data.token);"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{baseUrl}}/auth/login",
-            "body": { "mode": "raw", "raw": "{\n  \"email\": \"sofia.rodriguez@aleman.org.ar\",\n  \"password\": \"test\"\n}" }
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"sofia.rodriguez@aleman.org.ar\",\n  \"password\": \"test\"\n}"
+            }
           }
         },
         {
           "name": "Logout",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
             "url": "{{baseUrl}}/auth/logout"
           }
         }
@@ -67,15 +137,37 @@
           "name": "Get Nearest Institution",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/institutions/nearby?longitude=-58.4217&latitude=-34.6039&maxDistance=5000",
-              "host": ["{{baseUrl}}"],
-              "path": ["institutions", "nearby"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "institutions",
+                "nearby"
+              ],
               "query": [
-                { "key": "longitude",   "value": "-58.4217", "description": "Longitud del punto de referencia" },
-                { "key": "latitude",    "value": "-34.6039", "description": "Latitud del punto de referencia" },
-                { "key": "maxDistance", "value": "5000",     "description": "Distancia maxima en metros (default 10000)" }
+                {
+                  "key": "longitude",
+                  "value": "-58.4217",
+                  "description": "Longitud del punto de referencia"
+                },
+                {
+                  "key": "latitude",
+                  "value": "-34.6039",
+                  "description": "Latitud del punto de referencia"
+                },
+                {
+                  "key": "maxDistance",
+                  "value": "5000",
+                  "description": "Distancia maxima en metros (default 10000)"
+                }
               ]
             }
           }
@@ -89,15 +181,39 @@
           "name": "Get All Persons",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/persons",
-              "host": ["{{baseUrl}}"],
-              "path": ["persons"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "persons"
+              ],
               "query": [
-                { "key": "status",      "value": "UNIDENTIFIED",  "description": "UNIDENTIFIED | POTENTIAL_MATCH | IDENTIFIED", "disabled": true },
-                { "key": "institution", "value": "<id>",          "description": "Filtrar por institucion (ObjectId)",           "disabled": true },
-                { "key": "gender",      "value": "MALE",          "description": "MALE | FEMALE",                                "disabled": true }
+                {
+                  "key": "status",
+                  "value": "UNIDENTIFIED",
+                  "description": "UNIDENTIFIED | POTENTIAL_MATCH | IDENTIFIED",
+                  "disabled": true
+                },
+                {
+                  "key": "institution",
+                  "value": "<id>",
+                  "description": "Filtrar por institucion (ObjectId)",
+                  "disabled": true
+                },
+                {
+                  "key": "gender",
+                  "value": "MALE",
+                  "description": "MALE | FEMALE",
+                  "disabled": true
+                }
               ]
             }
           }
@@ -106,32 +222,79 @@
           "name": "Get Person by ID",
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
             "url": "{{baseUrl}}/persons/:id",
-            "variable": [{ "key": "id", "value": "<person_id>" }]
+            "variable": [
+              {
+                "key": "id",
+                "value": "<person_id>"
+              }
+            ]
           }
         },
         {
           "name": "Create Person",
-          "description": "multipart/form-data. 'location' y 'reportedBy' se calculan automaticamente del token del usuario autenticado. Imagenes opcionales (campo 'images', hasta 10, jpg/png/webp, max 5MB c/u).",
+          "description": "multipart/form-data. 'location', 'reportedBy', 'assignedTo', 'institution' y 'dateOfAdmission' se calculan automaticamente del token. Imagenes opcionales (campo 'images', hasta 10, jpg/png/webp, max 5MB c/u).",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
             "url": "{{baseUrl}}/persons",
             "body": {
               "mode": "formdata",
               "formdata": [
-                { "key": "estimatedAge",        "value": "35",                                                      "type": "text" },
-                { "key": "gender",              "value": "MALE",                                                    "type": "text", "description": "MALE | FEMALE" },
-                { "key": "height",              "value": "1.75m",                                                   "type": "text" },
-                { "key": "weight",              "value": "70kg",                                                    "type": "text" },
-                { "key": "distinctiveFeatures", "value": "Tatuaje en brazo derecho, cicatriz en mejilla izquierda", "type": "text" },
-                { "key": "consciousnessLevel",  "value": "CONSCIOUS",                                              "type": "text", "description": "CONSCIOUS | DISORIENTED | UNCONSCIOUS | SEDATED" },
-                { "key": "institution",         "value": "<institution_id>",                                        "type": "text" },
-                { "key": "dateOfAdmission",     "value": "2026-06-03T14:30:00",                                     "type": "text" },
-                { "key": "assignedTo",          "value": "Policia Federal",                                         "type": "text" },
-                { "key": "notes",               "value": "Sin documentacion. Ingreso por guardia de emergencias.",  "type": "text" },
-                { "key": "images",              "value": "",                                                         "type": "file", "disabled": true }
+                {
+                  "key": "estimatedAge",
+                  "value": "35",
+                  "type": "text"
+                },
+                {
+                  "key": "gender",
+                  "value": "MALE",
+                  "type": "text",
+                  "description": "MALE | FEMALE"
+                },
+                {
+                  "key": "height",
+                  "value": "1.75m",
+                  "type": "text"
+                },
+                {
+                  "key": "weight",
+                  "value": "70kg",
+                  "type": "text"
+                },
+                {
+                  "key": "distinctiveFeatures",
+                  "value": "Tatuaje en brazo derecho, cicatriz en mejilla izquierda",
+                  "type": "text"
+                },
+                {
+                  "key": "consciousnessLevel",
+                  "value": "CONSCIOUS",
+                  "type": "text",
+                  "description": "CONSCIOUS | DISORIENTED | UNCONSCIOUS | SEDATED"
+                },
+                {
+                  "key": "notes",
+                  "value": "Sin documentacion. Ingreso por guardia de emergencias.",
+                  "type": "text"
+                },
+                {
+                  "key": "images",
+                  "value": "",
+                  "type": "file",
+                  "disabled": true
+                }
               ]
             }
           }
@@ -141,15 +304,26 @@
           "request": {
             "method": "PUT",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Content-Type",  "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "url": "{{baseUrl}}/persons/:id",
-            "variable": [{ "key": "id", "value": "<person_id>" }],
+            "variable": [
+              {
+                "key": "id",
+                "value": "<person_id>"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"status\": \"POTENTIAL_MATCH\",\n  \"assignedTo\": \"EAAF\",\n  \"notes\": \"Posible coincidencia con denuncia #1234\"\n}",
-              "description": "status: UNIDENTIFIED | POTENTIAL_MATCH | IDENTIFIED"
+              "description": "status: UNIDENTIFIED | POTENTIAL_MATCH | IDENTIFIED. assignedTo se puede sobreescribir manualmente."
             }
           }
         },
@@ -158,13 +332,27 @@
           "description": "Agrega fotos a una persona existente. Campo 'images' (hasta 10, jpg/png/webp, max 5MB c/u).",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
             "url": "{{baseUrl}}/persons/:id/photos",
-            "variable": [{ "key": "id", "value": "<person_id>" }],
+            "variable": [
+              {
+                "key": "id",
+                "value": "<person_id>"
+              }
+            ],
             "body": {
               "mode": "formdata",
               "formdata": [
-                { "key": "images", "value": "", "type": "file" }
+                {
+                  "key": "images",
+                  "value": "",
+                  "type": "file"
+                }
               ]
             }
           }
@@ -173,9 +361,19 @@
           "name": "Delete Person",
           "request": {
             "method": "DELETE",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
             "url": "{{baseUrl}}/persons/:id",
-            "variable": [{ "key": "id", "value": "<person_id>" }]
+            "variable": [
+              {
+                "key": "id",
+                "value": "<person_id>"
+              }
+            ]
           }
         }
       ]
@@ -188,12 +386,21 @@
           "description": "Sube una imagen generica. Campo form-data: 'image'.",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
             "url": "{{baseUrl}}/upload",
             "body": {
               "mode": "formdata",
               "formdata": [
-                { "key": "image", "value": "", "type": "file" }
+                {
+                  "key": "image",
+                  "value": "",
+                  "type": "file"
+                }
               ]
             }
           }

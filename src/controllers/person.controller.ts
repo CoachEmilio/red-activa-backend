@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { WSresponse } from '../lib';
-import { personService } from '../services/person.service';
+import { personService, CreatePersonContext } from '../services/person.service';
 import { uploadService } from '../services/upload.service';
 import { institutionService } from '../services/institution.service';
 import { Gender, PersonStatus, UserRole } from '../enums';
@@ -10,20 +10,17 @@ const create = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const files = (req.files as Express.Multer.File[]) ?? [];
 
-    // Auto-compute location from user's institution address
     const institution = await institutionService.findById(res.locals.institutionId);
 
-    // Auto-compute reportedBy with professional prefix
-    const reportedBy = buildReportedBy(
-      res.locals.role as UserRole,
-      res.locals.gender as Gender,
-      res.locals.fullName,
-    );
+    const ctx: CreatePersonContext = {
+      userId: res.locals.userId,
+      institutionId: res.locals.institutionId,
+      location: institution.address,
+      reportedBy: buildReportedBy(res.locals.role as UserRole, res.locals.gender as Gender, res.locals.fullName),
+      assignedTo: res.locals.entity,
+    };
 
-    const person = await personService.create(
-      { ...req.body, location: institution.address, reportedBy },
-      res.locals.userId,
-    );
+    const person = await personService.create(req.body, ctx);
 
     if (files.length > 0) {
       const photoUrls = uploadService.movePersonImages(files, (person._id as any).toString());

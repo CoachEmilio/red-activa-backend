@@ -13,13 +13,24 @@ const buildPopulatedQuery = (query: ReturnType<typeof PersonModel.find>, detail 
     .populate('institution', detail ? INSTITUTION_DETAIL_FIELDS : INSTITUTION_FIELDS)
     .populate('createdBy', CREATED_BY_FIELDS);
 
-const create = async (dto: CreatePersonDto, userId: string, photoUrls: string[] = []) => {
+export interface CreatePersonContext {
+  userId: string;
+  institutionId: string;
+  location: string;
+  reportedBy: string;
+  assignedTo: string;
+}
+
+const create = async (dto: CreatePersonDto, ctx: CreatePersonContext, photoUrls: string[] = []) => {
   const person = await PersonModel.create({
     ...dto,
-    institution: new mongoose.Types.ObjectId(dto.institution),
-    dateOfAdmission: new Date(dto.dateOfAdmission),
+    institution: new mongoose.Types.ObjectId(ctx.institutionId),
+    location: ctx.location,
+    reportedBy: ctx.reportedBy,
+    assignedTo: ctx.assignedTo,
+    dateOfAdmission: new Date(),
     status: PersonStatus.UNIDENTIFIED,
-    createdBy: new mongoose.Types.ObjectId(userId),
+    createdBy: new mongoose.Types.ObjectId(ctx.userId),
     identifyingPhotos: photoUrls.map((url) => ({ url, uploadedAt: new Date() })),
   });
   return person.populate([
@@ -44,12 +55,8 @@ const findById = async (id: string) => {
 };
 
 const update = async (id: string, dto: UpdatePersonDto) => {
-  const payload: Record<string, any> = { ...dto };
-  if (dto.institution) payload.institution = new mongoose.Types.ObjectId(dto.institution);
-  if (dto.dateOfAdmission) payload.dateOfAdmission = new Date(dto.dateOfAdmission);
-
   const updated = await buildPopulatedQuery(
-    PersonModel.findByIdAndUpdate(id, payload, { new: true, runValidators: true }) as any,
+    PersonModel.findByIdAndUpdate(id, dto, { new: true, runValidators: true }) as any,
   );
   if (!updated) throw new CustomError(ApiError.Person.notFound);
   return updated;
