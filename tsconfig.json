@@ -1,6 +1,10 @@
 {
   "files": ["src/server.ts"],
   "include": ["src/**/*.ts"],
+  "ts-node": {
+    "transpileOnly": true,
+    "files": true
+  },
   "compilerOptions": {
     "module": "commonjs",
     "noImplicitAny": false,

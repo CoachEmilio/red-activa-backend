@@ -1,13 +1,13 @@
-import { Gender, ConsciousnessLevel, PersonStatus } from '../../enums';
+﻿import { Gender, ConsciousnessLevel, PersonStatus } from '../../enums';
 
 export interface CreatePersonDto {
-  estimatedAge: number;
+  estimatedAgeMin: number;
+  estimatedAgeMax: number;
   gender: Gender;
-  height: number;
-  weight: number;
+  height?: number;
+  weight?: number;
   distinctiveFeatures: string;
   consciousnessLevel: ConsciousnessLevel;
-  notes?: string;
 }
 
 export interface UpdatePersonDto extends Partial<CreatePersonDto> {

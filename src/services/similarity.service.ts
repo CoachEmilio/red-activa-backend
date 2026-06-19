@@ -1,13 +1,26 @@
-import { logger } from '../lib';
+﻿import { logger } from '../lib';
+import { Gender } from '../enums';
 
 export interface SimilarityCandidate {
-  personId: string;
+  reportId: string;
   description: string;
+  gender?: Gender;
+  estimatedAge?: number;
+}
+
+export interface PersonAgeRange {
+  min: number;
+  max: number;
 }
 
 export interface SimilarityResult {
-  personId: string;
+  reportId: string;
   score: number;
+  breakdown: {
+    text: number;
+    gender: number | null;
+    age: number | null;
+  };
   matches: string[];
 }
 
@@ -22,7 +35,7 @@ const normalize = (text: string): string =>
   text
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[Ì€-Í¯]/g, '')
     .replace(/[^a-z0-9\s]/g, ' ');
 
 const tokenize = (text: string): string[] =>
@@ -52,32 +65,72 @@ const cosineSimilarity = (a: Map<string, number>, b: Map<string, number>): numbe
   return dot / (Math.sqrt(normA) * Math.sqrt(normB));
 };
 
+const genderScore = (personGender: Gender, reportGender?: Gender): number | null => {
+  if (!reportGender) return null;
+  return personGender === reportGender ? 1 : 0;
+};
+
+const ageScore = (personAge: PersonAgeRange, reportAge?: number): number | null => {
+  if (reportAge === undefined || reportAge === null) return null;
+  if (reportAge >= personAge.min && reportAge <= personAge.max) return 1;
+  const dist = reportAge < personAge.min ? personAge.min - reportAge : reportAge - personAge.max;
+  return Math.max(0, 1 - dist / 20);
+};
+
+const computeWeights = (hasGender: boolean, hasAge: boolean) => {
+  if (hasGender && hasAge) return { text: 0.6, gender: 0.2, age: 0.2 };
+  if (hasGender) return { text: 0.7, gender: 0.3, age: 0 };
+  if (hasAge) return { text: 0.7, gender: 0, age: 0.3 };
+  return { text: 1.0, gender: 0, age: 0 };
+};
+
 const findMatchingTerms = (queryTokens: string[], candidateTokens: string[]): string[] => {
   const candidateSet = new Set(candidateTokens);
   return [...new Set(queryTokens.filter((t) => candidateSet.has(t)))];
 };
 
-const compare = async (
-  query: string,
+const compare = (
+  personFeatures: string,
+  personGender: Gender,
+  personAge: PersonAgeRange,
   candidates: SimilarityCandidate[],
-): Promise<SimilarityResult[]> => {
+): SimilarityResult[] => {
   if (candidates.length === 0) return [];
 
-  const queryTokens = tokenize(query);
+  const queryTokens = tokenize(personFeatures);
   const queryVec = buildFreqVector(queryTokens);
 
   const results: SimilarityResult[] = candidates
     .map((c) => {
+      const gScore = genderScore(personGender, c.gender);
+      const aScore = ageScore(personAge, c.estimatedAge);
+      const weights = computeWeights(gScore !== null, aScore !== null);
+
       const candidateTokens = tokenize(c.description);
       const candidateVec = buildFreqVector(candidateTokens);
-      const score = cosineSimilarity(queryVec, candidateVec);
+      const tScore = cosineSimilarity(queryVec, candidateVec);
+
+      const score =
+        tScore * weights.text +
+        (gScore ?? 0) * weights.gender +
+        (aScore ?? 0) * weights.age;
+
       const matches = findMatchingTerms(queryTokens, candidateTokens);
-      return { personId: c.personId, score: Math.round(score * 100) / 100, matches };
+
+      return {
+        reportId: c.reportId,
+        score: Math.round(score * 100) / 100,
+        breakdown: {
+          text: Math.round(tScore * 100) / 100,
+          gender: gScore !== null ? Math.round(gScore * 100) / 100 : null,
+          age: aScore !== null ? Math.round(aScore * 100) / 100 : null,
+        },
+        matches,
+      };
     })
-    .filter((r) => r.score > 0)
     .sort((a, b) => b.score - a.score);
 
-  logger.info({ candidates: candidates.length, results: results.length }, 'Local similarity check');
+  logger.info({ candidates: candidates.length, results: results.length }, 'Composite similarity check');
 
   return results;
 };

@@ -25,7 +25,7 @@ const userSchema = new Schema<IUser>(
     avatarUrl: { type: String },
     institution: { type: Schema.Types.ObjectId, ref: 'Institution', required: true },
   },
-  { timestamps: true },
+  { timestamps: true, versionKey: false },
 );
 
 userSchema.pre('save', async function () {

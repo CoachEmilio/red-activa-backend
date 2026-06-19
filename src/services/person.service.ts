@@ -4,8 +4,8 @@ import { CustomError } from '../lib';
 import { ApiError, PersonStatus } from '../enums';
 import { CreatePersonDto, UpdatePersonDto, PersonFilters } from '../types';
 
-const INSTITUTION_FIELDS = 'name type address';
-const INSTITUTION_DETAIL_FIELDS = 'name type address phone location';
+const INSTITUTION_FIELDS = 'name type address neighborhood';
+const INSTITUTION_DETAIL_FIELDS = 'name type address phone neighborhood location';
 const CREATED_BY_FIELDS = 'firstName lastName email';
 
 const buildPopulatedQuery = (query: ReturnType<typeof PersonModel.find>, detail = false) =>
@@ -16,7 +16,9 @@ const buildPopulatedQuery = (query: ReturnType<typeof PersonModel.find>, detail 
 export interface CreatePersonContext {
   userId: string;
   institutionId: string;
-  location: string;
+  address: string;
+  neighborhood: string;
+  geoLocation: [number, number];
   reportedBy: string;
   assignedTo: string;
 }
@@ -25,7 +27,9 @@ const create = async (dto: CreatePersonDto, ctx: CreatePersonContext, photoUrls:
   const person = await PersonModel.create({
     ...dto,
     institution: new mongoose.Types.ObjectId(ctx.institutionId),
-    location: ctx.location,
+    address: ctx.address,
+    neighborhood: ctx.neighborhood,
+    geoLocation: { type: 'Point', coordinates: ctx.geoLocation },
     reportedBy: ctx.reportedBy,
     assignedTo: ctx.assignedTo,
     dateOfAdmission: new Date(),
@@ -40,7 +44,7 @@ const create = async (dto: CreatePersonDto, ctx: CreatePersonContext, photoUrls:
 };
 
 const findAll = async (filters: PersonFilters = {}) => {
-  const query: Record<string, any> = {};
+  const query: Record<string, any> = { deletedAt: null };
   if (filters.status) query.status = filters.status;
   if (filters.institution) query.institution = new mongoose.Types.ObjectId(filters.institution);
   if (filters.gender) query.gender = filters.gender;
@@ -49,14 +53,21 @@ const findAll = async (filters: PersonFilters = {}) => {
 };
 
 const findById = async (id: string) => {
-  const person = await buildPopulatedQuery(PersonModel.findById(id) as any, true);
+  const person = await buildPopulatedQuery(
+    PersonModel.findOne({ _id: id, deletedAt: null }) as any,
+    true,
+  );
   if (!person) throw new CustomError(ApiError.Person.notFound);
   return person;
 };
 
 const update = async (id: string, dto: UpdatePersonDto) => {
   const updated = await buildPopulatedQuery(
-    PersonModel.findByIdAndUpdate(id, dto, { new: true, runValidators: true }) as any,
+    PersonModel.findOneAndUpdate(
+      { _id: id, deletedAt: null },
+      dto,
+      { new: true, runValidators: true },
+    ) as any,
   );
   if (!updated) throw new CustomError(ApiError.Person.notFound);
   return updated;
@@ -64,8 +75,8 @@ const update = async (id: string, dto: UpdatePersonDto) => {
 
 const addPhotos = async (id: string, photoUrls: string[]) => {
   const photos = photoUrls.map((url) => ({ url, uploadedAt: new Date() }));
-  const person = await PersonModel.findByIdAndUpdate(
-    id,
+  const person = await PersonModel.findOneAndUpdate(
+    { _id: id, deletedAt: null },
     { $push: { identifyingPhotos: { $each: photos } } },
     { new: true },
   );
@@ -74,7 +85,11 @@ const addPhotos = async (id: string, photoUrls: string[]) => {
 };
 
 const remove = async (id: string) => {
-  const deleted = await PersonModel.findByIdAndDelete(id);
+  const deleted = await PersonModel.findOneAndUpdate(
+    { _id: id, deletedAt: null },
+    { deletedAt: new Date() },
+    { new: true },
+  );
   if (!deleted) throw new CustomError(ApiError.Person.notFound);
 };
 

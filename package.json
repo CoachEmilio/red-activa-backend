@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "rm -rf dist/ && tsc",
-    "dev": "nodemon",
+    "dev": "fuser -k 3001/tcp 2>/dev/null; nodemon",
     "start": "node dist/src/server.js",
     "deploy": "yarn build && yarn migrate && yarn start",
     "migrate": "node_modules/.bin/sequelize db:migrate",

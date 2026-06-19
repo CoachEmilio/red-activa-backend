@@ -11,6 +11,7 @@ import { customErrors } from './enums';
 import { routes } from './routes';
 import { CustomError, WSresponse, logger } from './lib';
 import { runSeeders } from './seeders/institutions.seeder';
+import { runNeighborhoodsSeeders } from './seeders/neighborhoods.seeder';
 import { runUsersSeeders } from './seeders/users.seeder';
 import { runPersonsSeeders } from './seeders/persons.seeder';
 import { runReportsSeeders } from './seeders/reports.seeder';
@@ -54,6 +55,7 @@ export class App {
     try {
       await mongoose.connect(config.mongoUrl);
       logger.info('MongoDB connection successfully');
+      await runNeighborhoodsSeeders();
       await runSeeders();
       await runUsersSeeders();
       await runPersonsSeeders();

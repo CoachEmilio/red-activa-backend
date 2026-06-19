@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+﻿import { Request, Response, NextFunction } from 'express';
 import { WSresponse, logger } from '../lib';
 import { personService, CreatePersonContext } from '../services/person.service';
 import { uploadService } from '../services/upload.service';
@@ -12,21 +12,37 @@ import { IReport, ReportModel } from '../models/report.model';
 
 const runSimilarityInBackground = (newPerson: IPerson): void => {
   const personId = (newPerson._id as any).toString();
-  const query = [newPerson.distinctiveFeatures, newPerson.notes].filter(Boolean).join('. ');
 
-  ReportModel.find()
+  // Use $text pre-filter to narrow candidates to reports with matching terms,
+  // then fall back to all reports if the person features produce no $text hits.
+  const textQuery = { $text: { $search: newPerson.distinctiveFeatures }, deletedAt: null };
+  const fallbackQuery = { deletedAt: null };
+
+  ReportModel.find(textQuery, { score: { $meta: 'textScore' } })
+    .sort({ score: { $meta: 'textScore' } })
     .then(async (reports) => {
-      if (reports.length === 0) return;
+      const source = reports.length > 0 ? reports : await ReportModel.find(fallbackQuery);
+      if (source.length === 0) return;
 
-      const candidates: SimilarityCandidate[] = (reports as IReport[]).map((d) => ({
-        personId: (d._id as any).toString(),
-        description: d.description,
+      const candidates: SimilarityCandidate[] = (source as IReport[]).map((r) => ({
+        reportId: (r._id as any).toString(),
+        description: r.description,
+        gender: r.gender,
+        estimatedAge: r.estimatedAge,
       }));
 
-      const results = await similarityService.compare(query, candidates);
+      const results = similarityService.compare(
+        newPerson.distinctiveFeatures,
+        newPerson.gender,
+        { min: newPerson.estimatedAgeMin, max: newPerson.estimatedAgeMax },
+        candidates,
+      );
       await similarityMatchService.saveMany(personId, results);
 
-      logger.info({ personId, saved: results.filter((r) => r.score >= 0.70).length }, 'Similarity check completed');
+      logger.info(
+        { personId, candidates: candidates.length, saved: results.length, textFiltered: reports.length > 0 },
+        'Similarity check completed',
+      );
     })
     .catch((err) => logger.error(err, 'Background similarity check failed'));
 };
@@ -43,7 +59,9 @@ const create = async (req: Request, res: Response, next: NextFunction) => {
     const ctx: CreatePersonContext = {
       userId: res.locals.userId,
       institutionId: res.locals.institutionId,
-      location: institution.address,
+      address: institution.address,
+      neighborhood: institution.neighborhood,
+      geoLocation: institution.location.coordinates,
       reportedBy: buildReportedBy(res.locals.role as UserRole, res.locals.gender as Gender, res.locals.fullName),
       assignedTo: nearestManagement?.name ?? res.locals.entity,
     };

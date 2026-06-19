@@ -1,4 +1,4 @@
-{
+﻿{
   "info": {
     "name": "Red Activa API",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -46,12 +46,7 @@
           ],
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "url": "{{baseUrl}}/auth/login",
             "body": {
               "mode": "raw",
@@ -74,12 +69,7 @@
           ],
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "url": "{{baseUrl}}/auth/login",
             "body": {
               "mode": "raw",
@@ -102,12 +92,7 @@
           ],
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "url": "{{baseUrl}}/auth/login",
             "body": {
               "mode": "raw",
@@ -119,12 +104,7 @@
           "name": "Logout",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": "{{baseUrl}}/auth/logout"
           }
         }
@@ -137,37 +117,15 @@
           "name": "Get Nearest Institution",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": {
               "raw": "{{baseUrl}}/institutions/nearby?longitude=-58.4217&latitude=-34.6039&maxDistance=5000",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "institutions",
-                "nearby"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["institutions", "nearby"],
               "query": [
-                {
-                  "key": "longitude",
-                  "value": "-58.4217",
-                  "description": "Longitud del punto de referencia"
-                },
-                {
-                  "key": "latitude",
-                  "value": "-34.6039",
-                  "description": "Latitud del punto de referencia"
-                },
-                {
-                  "key": "maxDistance",
-                  "value": "5000",
-                  "description": "Distancia maxima en metros (default 10000)"
-                }
+                { "key": "longitude", "value": "-58.4217", "description": "Longitud del punto de referencia" },
+                { "key": "latitude", "value": "-34.6039", "description": "Latitud del punto de referencia" },
+                { "key": "maxDistance", "value": "5000", "description": "Distancia maxima en metros (default 10000)", "disabled": true }
               ]
             }
           }
@@ -181,39 +139,15 @@
           "name": "Get All Persons",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": {
               "raw": "{{baseUrl}}/persons",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "persons"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["persons"],
               "query": [
-                {
-                  "key": "status",
-                  "value": "UNIDENTIFIED",
-                  "description": "UNIDENTIFIED | POTENTIAL_MATCH | IDENTIFIED",
-                  "disabled": true
-                },
-                {
-                  "key": "institution",
-                  "value": "<id>",
-                  "description": "Filtrar por institucion (ObjectId)",
-                  "disabled": true
-                },
-                {
-                  "key": "gender",
-                  "value": "MALE",
-                  "description": "MALE | FEMALE",
-                  "disabled": true
-                }
+                { "key": "status", "value": "UNIDENTIFIED", "description": "UNIDENTIFIED | POTENTIAL_MATCH | IDENTIFIED", "disabled": true },
+                { "key": "institution", "value": "<id>", "description": "Filtrar por institucion (ObjectId)", "disabled": true },
+                { "key": "gender", "value": "MALE", "description": "MALE | FEMALE", "disabled": true }
               ]
             }
           }
@@ -222,79 +156,34 @@
           "name": "Get Person by ID",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": "{{baseUrl}}/persons/:id",
-            "variable": [
-              {
-                "key": "id",
-                "value": "<person_id>"
-              }
-            ]
+            "variable": [{ "key": "id", "value": "<person_id>" }]
           }
         },
         {
           "name": "Create Person",
-          "description": "multipart/form-data. 'location', 'reportedBy', 'assignedTo', 'institution' y 'dateOfAdmission' se calculan automaticamente del token. Imagenes opcionales (campo 'images', hasta 10, jpg/png/webp, max 5MB c/u).",
+          "description": "multipart/form-data. 'address', 'neighborhood', 'geoLocation', 'reportedBy', 'assignedTo', 'institution' y 'dateOfAdmission' se calculan automaticamente del token y la institucion del usuario. Al crear un NN se dispara un job en background que compara contra todos los reportes de desaparecidos y guarda los matches con score >= 0.5 en SimilarityMatch. Imagenes opcionales (campo 'images', hasta 10, jpg/png/webp, max 5MB c/u).",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": "{{baseUrl}}/persons",
             "body": {
               "mode": "formdata",
               "formdata": [
-                {
-                  "key": "estimatedAge",
-                  "value": "35",
-                  "type": "text"
-                },
-                {
-                  "key": "gender",
-                  "value": "MALE",
-                  "type": "text",
-                  "description": "MALE | FEMALE"
-                },
-                {
-                  "key": "height",
-                  "value": "1.75m",
-                  "type": "text"
-                },
-                {
-                  "key": "weight",
-                  "value": "70kg",
-                  "type": "text"
-                },
+                { "key": "estimatedAgeMin", "value": "40", "type": "text", "description": "Edad minima estimada visualmente" },
+                { "key": "estimatedAgeMax", "value": "50", "type": "text", "description": "Edad maxima estimada visualmente" },
+                { "key": "gender", "value": "MALE", "type": "text", "description": "MALE | FEMALE" },
+                { "key": "height", "value": "1.72", "type": "text", "description": "Opcional. Metros (0.3 - 2.5)" },
+                { "key": "weight", "value": "78", "type": "text", "description": "Opcional. Kg" },
                 {
                   "key": "distinctiveFeatures",
-                  "value": "Tatuaje en brazo derecho, cicatriz en mejilla izquierda",
-                  "type": "text"
-                },
-                {
-                  "key": "consciousnessLevel",
-                  "value": "CONSCIOUS",
+                  "value": "Tatuaje de cruz en antebrazo izquierdo. Cicatriz en ceja derecha. Usa anteojos de armazon negra.",
                   "type": "text",
-                  "description": "CONSCIOUS | DISORIENTED | UNCONSCIOUS | SEDATED"
+                  "description": "Usado por el motor de similitud. El rango de edad se compara contra la edad exacta del reporte: score 1.0 si esta dentro del rango, decrece 0.05 por cada año fuera del rango hasta 20 años de diferencia."
                 },
-                {
-                  "key": "notes",
-                  "value": "Sin documentacion. Ingreso por guardia de emergencias.",
-                  "type": "text"
-                },
-                {
-                  "key": "images",
-                  "value": "",
-                  "type": "file",
-                  "disabled": true
-                }
+                { "key": "consciousnessLevel", "value": "CONSCIOUS", "type": "text", "description": "CONSCIOUS | DISORIENTED | UNCONSCIOUS | SEDATED" },
+                { "key": "images", "value": "", "type": "file", "disabled": true }
               ]
             }
           }
@@ -304,26 +193,15 @@
           "request": {
             "method": "PUT",
             "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "url": "{{baseUrl}}/persons/:id",
-            "variable": [
-              {
-                "key": "id",
-                "value": "<person_id>"
-              }
-            ],
+            "variable": [{ "key": "id", "value": "<person_id>" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"status\": \"POTENTIAL_MATCH\",\n  \"assignedTo\": \"EAAF\",\n  \"notes\": \"Posible coincidencia con denuncia #1234\"\n}",
-              "description": "status: UNIDENTIFIED | POTENTIAL_MATCH | IDENTIFIED. assignedTo se puede sobreescribir manualmente."
+              "raw": "{\n  \"status\": \"POTENTIAL_MATCH\",\n  \"assignedTo\": \"EAAF\"\n}",
+              "description": "status: UNIDENTIFIED | POTENTIAL_MATCH | IDENTIFIED. Campos actualizables: estimatedAge, gender, height, weight, distinctiveFeatures, consciousnessLevel, status, assignedTo."
             }
           }
         },
@@ -332,48 +210,103 @@
           "description": "Agrega fotos a una persona existente. Campo 'images' (hasta 10, jpg/png/webp, max 5MB c/u).",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": "{{baseUrl}}/persons/:id/photos",
-            "variable": [
-              {
-                "key": "id",
-                "value": "<person_id>"
-              }
-            ],
+            "variable": [{ "key": "id", "value": "<person_id>" }],
             "body": {
               "mode": "formdata",
               "formdata": [
-                {
-                  "key": "images",
-                  "value": "",
-                  "type": "file"
-                }
+                { "key": "images", "value": "", "type": "file" }
               ]
             }
           }
         },
         {
+          "name": "Get Person Similarity Matches",
+          "description": "Devuelve los reportes de desaparecidos que hicieron match con este NN, ordenados por score descendente. Score entre 0 y 1. Breakdown: text (similitud coseno sobre rasgos), gender (1=coincide, 0=no coincide, null=reporte sin genero), age (1=igual edad, 0=20+ aÃ±os de diferencia, null=reporte sin edad). Solo se guardan matches con score >= 0.5.",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/persons/:id/similarities",
+            "variable": [{ "key": "id", "value": "<person_id>" }]
+          }
+        },
+        {
           "name": "Delete Person",
+          "description": "Soft delete. El registro queda en la base con deletedAt seteado y no aparece en listados.",
           "request": {
             "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": "{{baseUrl}}/persons/:id",
-            "variable": [
-              {
-                "key": "id",
-                "value": "<person_id>"
-              }
-            ]
+            "variable": [{ "key": "id", "value": "<person_id>" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reports (Desaparecidos)",
+      "item": [
+        {
+          "name": "Get All Reports",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/reports",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports"]
+            }
+          }
+        },
+        {
+          "name": "Get Report by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/reports/:id",
+            "variable": [{ "key": "id", "value": "<report_id>" }]
+          }
+        },
+        {
+          "name": "Get Report Similarity Matches",
+          "description": "Devuelve los NN que hicieron match con este reporte de desaparecido, ordenados por score descendente. Popula datos del NN: estimatedAge, gender, distinctiveFeatures, status, address, dateOfAdmission, identifyingPhotos.",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/reports/:id/similarities",
+            "variable": [{ "key": "id", "value": "<report_id>" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "By Neighborhood",
+          "description": "Agrupa casos de NN y reportes de desaparecidos por barrio. Permite identificar zonas con alta concentracion de casos no resueltos. Resultado: array de { neighborhood, persons, reports }.",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/analytics/by-neighborhood"
+          }
+        },
+        {
+          "name": "Heatmap",
+          "description": "Retorna las instituciones con cantidad de NN activos, incluyendo coordenadas GeoJSON para renderizar un heatmap. Resultado: array de { institution, count, geoLocation: { type: Point, coordinates: [lon, lat] } }.",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/analytics/heatmap"
+          }
+        },
+        {
+          "name": "Summary",
+          "description": "Resumen ejecutivo via $facet. Incluye: total de NN, distribucion por estado (UNIDENTIFIED/POTENTIAL_MATCH/IDENTIFIED), distribucion por genero, total de reportes de desaparecidos, distribucion de reportes por genero, top 5 barrios con mas reportes, y total de matches de similitud guardados.",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/analytics/summary"
           }
         }
       ]
@@ -386,21 +319,12 @@
           "description": "Sube una imagen generica. Campo form-data: 'image'.",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": "{{baseUrl}}/upload",
             "body": {
               "mode": "formdata",
               "formdata": [
-                {
-                  "key": "image",
-                  "value": "",
-                  "type": "file"
-                }
+                { "key": "image", "value": "", "type": "file" }
               ]
             }
           }
