@@ -35,7 +35,7 @@ const normalize = (text: string): string =>
   text
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[Ì€-Í¯]/g, '')
+    .replace(/\p{Diacritic}/gu, '')
     .replace(/[^a-z0-9\s]/g, ' ');
 
 const tokenize = (text: string): string[] =>

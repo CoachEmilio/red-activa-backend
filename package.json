@@ -4,13 +4,14 @@
   "private": true,
   "scripts": {
     "build": "rm -rf dist/ && tsc",
-    "dev": "fuser -k 3001/tcp 2>/dev/null; nodemon",
+    "dev": "nodemon",
     "start": "node dist/src/server.js",
     "deploy": "yarn build && yarn migrate && yarn start",
     "migrate": "node_modules/.bin/sequelize db:migrate",
     "migrate-undo": "node_modules/.bin/sequelize db:migrate:undo"
   },
   "dependencies": {
+    "@google/genai": "^2.9.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@typescript-eslint/eslint-plugin": "^5.25.0",

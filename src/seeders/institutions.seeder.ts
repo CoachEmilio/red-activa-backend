@@ -3,7 +3,7 @@ import { InstitutionType } from '../enums';
 import { logger } from '../lib';
 import { SeederLog } from '../models/seeder-log.model';
 
-const SEEDER_ID = 'institutions-v2';
+const SEEDER_ID = 'institutions-seeder';
 
 const institutions = [
   {
@@ -53,7 +53,7 @@ const institutions = [
     type: InstitutionType.SANATORIUM,
     address: 'San Martín de Tours 2952, Palermo',
     neighborhood: 'Palermo',
-    location: { type: 'Point' as const, coordinates: [-58.4010, -34.5818] },
+    location: { type: 'Point' as const, coordinates: [-58.401, -34.5818] },
   },
   {
     name: 'Fundación Favaloro',
