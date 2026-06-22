@@ -4,12 +4,8 @@ export interface ISimilarityMatch extends Document {
   person: mongoose.Types.ObjectId;
   report: mongoose.Types.ObjectId;
   score: number;
-  breakdown: {
-    text: number;
-    gender: number | null;
-    age: number | null;
-  };
-  matches: string[];
+  differences: string[];
+  reasoning: string;
 }
 
 const similarityMatchSchema = new Schema<ISimilarityMatch>(
@@ -17,12 +13,8 @@ const similarityMatchSchema = new Schema<ISimilarityMatch>(
     person: { type: Schema.Types.ObjectId, ref: 'Person', required: true },
     report: { type: Schema.Types.ObjectId, ref: 'Report', required: true },
     score: { type: Number, required: true },
-    breakdown: {
-      text: { type: Number, required: true },
-      gender: { type: Number, default: null },
-      age: { type: Number, default: null },
-    },
-    matches: { type: [String], default: [] },
+    differences: { type: [String], default: [] },
+    reasoning: { type: String, default: '' },
   },
   { timestamps: true, versionKey: false },
 );

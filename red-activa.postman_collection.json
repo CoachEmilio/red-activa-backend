@@ -163,7 +163,7 @@
         },
         {
           "name": "Create Person",
-          "description": "multipart/form-data. 'address', 'neighborhood', 'geoLocation', 'reportedBy', 'assignedTo', 'institution' y 'dateOfAdmission' se calculan automaticamente del token y la institucion del usuario. Al crear un NN se dispara un job en background que compara contra todos los reportes de desaparecidos y guarda los matches con score >= 0.5 en SimilarityMatch. Imagenes opcionales (campo 'images', hasta 10, jpg/png/webp, max 5MB c/u).",
+          "description": "multipart/form-data. 'address', 'neighborhood', 'geoLocation', 'reportedBy', 'assignedTo', 'institution' y 'dateOfAdmission' se calculan automaticamente del token y la institucion del usuario. Al crear un NN se dispara un job en background que compara 'distinctiveFeatures' via IA (Gemini) contra los reportes de desaparecidos del mismo genero, barrio y rango de edad, y guarda los matches con score > 60 en SimilarityMatch. Imagenes opcionales (campo 'images', hasta 10, jpg/png/webp, max 5MB c/u) solo se pueden cargar en este paso, no hay endpoint para agregarlas despues.",
           "request": {
             "method": "POST",
             "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
@@ -180,7 +180,7 @@
                   "key": "distinctiveFeatures",
                   "value": "Tatuaje de cruz en antebrazo izquierdo. Cicatriz en ceja derecha. Usa anteojos de armazon negra.",
                   "type": "text",
-                  "description": "Usado por el motor de similitud. El rango de edad se compara contra la edad exacta del reporte: score 1.0 si esta dentro del rango, decrece 0.05 por cada año fuera del rango hasta 20 años de diferencia."
+                  "description": "Usado por el motor de similitud. Se compara textualmente via IA contra la descripcion de cada reporte candidato."
                 },
                 { "key": "consciousnessLevel", "value": "CONSCIOUS", "type": "text", "description": "CONSCIOUS | DISORIENTED | UNCONSCIOUS | SEDATED" },
                 { "key": "images", "value": "", "type": "file", "disabled": true }
@@ -201,43 +201,17 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"status\": \"POTENTIAL_MATCH\",\n  \"assignedTo\": \"EAAF\"\n}",
-              "description": "status: UNIDENTIFIED | POTENTIAL_MATCH | IDENTIFIED. Campos actualizables: estimatedAge, gender, height, weight, distinctiveFeatures, consciousnessLevel, status, assignedTo."
-            }
-          }
-        },
-        {
-          "name": "Add Photos to Person",
-          "description": "Agrega fotos a una persona existente. Campo 'images' (hasta 10, jpg/png/webp, max 5MB c/u).",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
-            "url": "{{baseUrl}}/persons/:id/photos",
-            "variable": [{ "key": "id", "value": "<person_id>" }],
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                { "key": "images", "value": "", "type": "file" }
-              ]
+              "description": "status: UNIDENTIFIED | POTENTIAL_MATCH | IDENTIFIED. Campos actualizables: estimatedAgeMin, estimatedAgeMax, gender, height, weight, distinctiveFeatures, consciousnessLevel, status, assignedTo."
             }
           }
         },
         {
           "name": "Get Person Similarity Matches",
-          "description": "Devuelve los reportes de desaparecidos que hicieron match con este NN, ordenados por score descendente. Score entre 0 y 1. Breakdown: text (similitud coseno sobre rasgos), gender (1=coincide, 0=no coincide, null=reporte sin genero), age (1=igual edad, 0=20+ aÃ±os de diferencia, null=reporte sin edad). Solo se guardan matches con score >= 0.5.",
+          "description": "Devuelve los reportes de desaparecidos que hicieron match con este NN, ordenados por score descendente. Score entre 1 y 100, devuelto por la IA. Incluye 'differences' (contradicciones detectadas) y 'reasoning' (justificacion). Solo se guardan matches con score > 60.",
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": "{{baseUrl}}/persons/:id/similarities",
-            "variable": [{ "key": "id", "value": "<person_id>" }]
-          }
-        },
-        {
-          "name": "Delete Person",
-          "description": "Soft delete. El registro queda en la base con deletedAt seteado y no aparece en listados.",
-          "request": {
-            "method": "DELETE",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
-            "url": "{{baseUrl}}/persons/:id",
             "variable": [{ "key": "id", "value": "<person_id>" }]
           }
         }
@@ -269,7 +243,7 @@
         },
         {
           "name": "Get Report Similarity Matches",
-          "description": "Devuelve los NN que hicieron match con este reporte de desaparecido, ordenados por score descendente. Popula datos del NN: estimatedAge, gender, distinctiveFeatures, status, address, dateOfAdmission, identifyingPhotos.",
+          "description": "Devuelve los NN que hicieron match con este reporte de desaparecido, ordenados por score descendente. Popula datos del NN: estimatedAgeMin, estimatedAgeMax, gender, distinctiveFeatures, status, address, dateOfAdmission, identifyingPhotos.",
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],

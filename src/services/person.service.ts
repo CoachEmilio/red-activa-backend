@@ -84,13 +84,4 @@ const addPhotos = async (id: string, photoUrls: string[]) => {
   return person;
 };
 
-const remove = async (id: string) => {
-  const deleted = await PersonModel.findOneAndUpdate(
-    { _id: id, deletedAt: null },
-    { deletedAt: new Date() },
-    { new: true },
-  );
-  if (!deleted) throw new CustomError(ApiError.Person.notFound);
-};
-
-export const personService = { create, findAll, findById, update, addPhotos, remove };
+export const personService = { create, findAll, findById, update, addPhotos };

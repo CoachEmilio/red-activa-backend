@@ -65,7 +65,7 @@ red-activa-backend/
 │   │   ├── institution.service.ts
 │   │   ├── person.service.ts
 │   │   ├── report.service.ts
-│   │   ├── similarity.service.ts     # Cosine similarity + scoring
+│   │   ├── similarity.service.ts     # Comparación de descripciones vía IA (Gemini)
 │   │   ├── similarity-match.service.ts
 │   │   └── upload.service.ts
 │   ├── models/                 # Schemas Mongoose (colecciones MongoDB)
@@ -184,11 +184,9 @@ Cliente HTTP
 |---|---|---|
 | `person` | ObjectId → Person | Referencia a persona |
 | `report` | ObjectId → Report | Referencia a reporte |
-| `score` | Number | Score compuesto 0–1 |
-| `breakdown.text` | Number | Score de similitud de coseno |
-| `breakdown.gender` | Number / null | Score de coincidencia de género |
-| `breakdown.age` | Number / null | Score de proximidad de edad |
-| `matches` | String[] | Tokens coincidentes entre documentos |
+| `score` | Number | Score de similitud 1–100 devuelto por la IA |
+| `differences` | String[] | Contradicciones detectadas entre ambas descripciones |
+| `reasoning` | String | Justificación de la IA para el score |
 
 **Índices:** `{person, report}` (unique), `{person, score}`, `{report, score}`
 

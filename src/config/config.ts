@@ -15,4 +15,7 @@ export default {
     pdf: process.env.BUCKET_PDF || 'pdf',
     image: process.env.BUCKET_IMAGE || 'image',
   },
+  google: {
+    apiKey: process.env.GOOGLE_API_KEY,
+  },
 };

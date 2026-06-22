@@ -2,13 +2,10 @@
 import { SimilarityMatchModel } from '../models/similarity-match.model';
 import { SimilarityResult } from './similarity.service';
 
-const SCORE_THRESHOLD = 0.5;
-
 const saveMany = async (personId: string, results: SimilarityResult[]): Promise<void> => {
-  const above = results.filter((r) => r.score >= SCORE_THRESHOLD);
-  if (above.length === 0) return;
+  if (results.length === 0) return;
 
-  const ops = above.map((r) => ({
+  const ops = results.map((r) => ({
     updateOne: {
       filter: {
         person: new mongoose.Types.ObjectId(personId),
@@ -17,8 +14,8 @@ const saveMany = async (personId: string, results: SimilarityResult[]): Promise<
       update: {
         $set: {
           score: r.score,
-          breakdown: r.breakdown,
-          matches: r.matches,
+          differences: r.differences,
+          reasoning: r.reasoning,
         },
       },
       upsert: true,
@@ -36,7 +33,10 @@ const findByPerson = async (personId: string) => {
 
 const findByReport = async (reportId: string) => {
   return SimilarityMatchModel.find({ report: new mongoose.Types.ObjectId(reportId) })
-    .populate('person', 'estimatedAge gender distinctiveFeatures status address dateOfAdmission identifyingPhotos')
+    .populate(
+      'person',
+      'estimatedAgeMin estimatedAgeMax gender distinctiveFeatures status address dateOfAdmission identifyingPhotos',
+    )
     .sort({ score: -1 });
 };
 
