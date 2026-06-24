@@ -16,7 +16,7 @@
 
 ## Actualizaciones
 
-**Recordar** este proyecto aun no está terminado para presentar esperando los ultimos cambios para el match de score en palabras que en comparacion tengan una coincidencia de por ejemplo un 75%, hasta ahora existe un algoritmo que cumple con el objetivo pero estamso buscando un opensource que sin cobro, logre dar con los resultados esperados.
+**Entrega Parcial 2** Informe con documentacióm, archivos técnicos más codigos fuentes, video con flujo terminados
 
 ## Índice
 
