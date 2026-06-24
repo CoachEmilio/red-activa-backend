@@ -1,6 +1,6 @@
-# Red Activa — Backend API
+# RedActiva — Backend API
 
-> Sistema de identificación y seguimiento de personas en situación de vulnerabilidad, con matching semántico entre registros institucionales y reportes ciudadanos.
+> Plataforma de detección y vinculación de personas desaparecidas. API REST que gestiona el registro de personas no identificadas en instituciones y las cruza con reportes ciudadanos mediante matching semántico.
 
 ![Node.js](https://img.shields.io/badge/Node.js-20.19-339933?logo=node.js&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?logo=typescript&logoColor=white)
@@ -14,13 +14,10 @@
 
 ---
 
-## Actualizaciones
-
-**Recordar** este proyecto aun no está terminado para presentar esperando los ultimos cambios para el match de score en palabras que en comparacion tengan una coincidencia de por ejemplo un 75%, hasta ahora existe un algoritmo que cumple con el objetivo pero estamso buscando un opensource que sin cobro, logre dar con los resultados esperados.
-
 ## Índice
 
 - [Descripción del proyecto](#descripción-del-proyecto)
+- [Estado del proyecto](#estado-del-proyecto)
 - [Arquitectura](#arquitectura)
 - [Stack tecnológico](#stack-tecnológico)
 - [Modelos de datos (MongoDB)](#modelos-de-datos-mongodb)
@@ -35,11 +32,20 @@
 
 ## Descripción del proyecto
 
-**Red Activa** es una API REST desarrollada para gestionar el registro de personas no identificadas en instituciones (hospitales, refugios, comisarías) y cruzar esos registros con reportes ciudadanos de personas desaparecidas. El sistema implementa un algoritmo de similitud compuesta (similitud de coseno sobre texto + score de género + score de edad) para sugerir posibles coincidencias automáticamente.
+**RedActiva** es una API REST desarrollada para gestionar el registro de personas no identificadas en instituciones (hospitales, refugios, comisarías) y cruzar esos registros con reportes ciudadanos de personas desaparecidas. El sistema implementa un algoritmo de similitud compuesta (similitud de coseno sobre texto + score de género + score de edad) para sugerir posibles coincidencias automáticamente.
 
-**Materia:** Ingeniería de Datos II — Datos No Relacionales  
-**Profesor:** Moises Evaristo Bueno  Federico Humberto, Arenales
-**Alumno:** Braian Botrera, Romero Quirino Luis Emilio, Di Pasquasio Federico, Manuel Zarrága, Agustin Diaz
+**Materia:** Ingeniería de Datos II — Datos No Relacionales
+**Profesor Titular:** Bueno, Moises Evaristo
+**Profesor Auxiliar:** Arenales, Federico Humberto
+**Grupo 9 — Integrantes:** Di Pasquasio, Federico Gabriel · Diaz Seoane, Agustin Edgardo · Otrera, Braian · Romero Quirino, Luis Emilio · Zarraga, Manuel Alejandro
+
+---
+
+## Estado del proyecto
+
+API funcional con los módulos de personas, instituciones, reportes, autenticación (JWT), carga de archivos y analytics. El cruce de similitud (*similarity matching*) se ejecuta en el backend y se valida a través de los endpoints `/similarities`, de Postman o consultando directamente la base de datos.
+
+La instancia de MongoDB corre en un único nodo mediante Docker. El escalado horizontal (sharding, replicación multinodo) está contemplado en el diseño conceptual, pero queda fuera del alcance de esta entrega.
 
 ---
 
@@ -65,7 +71,7 @@ red-activa-backend/
 │   │   ├── institution.service.ts
 │   │   ├── person.service.ts
 │   │   ├── report.service.ts
-│   │   ├── similarity.service.ts     # Comparación de descripciones vía IA (Gemini)
+│   │   ├── similarity.service.ts     # Cosine similarity + scoring
 │   │   ├── similarity-match.service.ts
 │   │   └── upload.service.ts
 │   ├── models/                 # Schemas Mongoose (colecciones MongoDB)
@@ -184,9 +190,11 @@ Cliente HTTP
 |---|---|---|
 | `person` | ObjectId → Person | Referencia a persona |
 | `report` | ObjectId → Report | Referencia a reporte |
-| `score` | Number | Score de similitud 1–100 devuelto por la IA |
-| `differences` | String[] | Contradicciones detectadas entre ambas descripciones |
-| `reasoning` | String | Justificación de la IA para el score |
+| `score` | Number | Score compuesto 0–1 |
+| `breakdown.text` | Number | Score de similitud de coseno |
+| `breakdown.gender` | Number / null | Score de coincidencia de género |
+| `breakdown.age` | Number / null | Score de proximidad de edad |
+| `matches` | String[] | Tokens coincidentes entre documentos |
 
 **Índices:** `{person, report}` (unique), `{person, score}`, `{report, score}`
 
@@ -320,7 +328,7 @@ yarn start    # corre el build compilado
 | `yarn dev` | Servidor con hot-reload (nodemon) |
 | `yarn build` | Compilar TypeScript |
 | `yarn start` | Correr build de producción |
-| `yarn deploy` | Build + migrate + start |
+| `yarn deploy` | Build + arranque de producción |
 
 ---
 
@@ -350,7 +358,7 @@ Historial de trabajo del equipo en este repositorio:
 
 | # | Hash | Fecha | Descripción |
 |---|---|---|---|
-| 7 | `ae0046a` | 2026-06-19 | change come services |
+| 7 | `ae0046a` | 2026-06-19 | change some services |
 | 6 | `80cd35b` | 2026-06-10 | added reports |
 | 5 | `95f5c51` | 2026-06-04 | fix types in person |
 | 4 | `1a162dc` | 2026-06-03 | Added env sample |
@@ -358,7 +366,7 @@ Historial de trabajo del equipo en este repositorio:
 | 2 | `7473680` | 2026-06-03 | Change types, create new endpoints |
 | 1 | `bba4505` | 2026-06-02 | first commit |
 
-**Autor:** Braian Botrera (`botrera`)
+**Autor:** Braian Otrera (`botrera`)
 
 **Resumen de evolución:**
 - **02/06** — Estructura inicial del proyecto (Express + MongoDB + TypeScript)
@@ -375,28 +383,10 @@ Historial de trabajo del equipo en este repositorio:
 
 > **Enfoque:** ejecución + consistencia + evolución
 
-| Item | Criterio | Peso | Insuficiente (1) | Aceptable (2) | Bueno (3) | Excelente (4) | Calif. |
-|---|---|---|---|---|---|---|---|
-| 5 | Implementación técnica | 9,0% | Incompleta o no funcional | Funciona parcialmente | Funcional y consistente | Robusta, completa y bien estructurada | |
-| 6 | Pipeline de datos (E2E) | 6,0% | Flujo incompleto o incorrecto | Pipeline básico con fallas | Pipeline completo funcional | Pipeline integrado, automatizado y eficiente | |
-| 7 | Calidad y performance | 5,0% | Bajo rendimiento | Rendimiento aceptable | Buen rendimiento | Optimización evidente y buenas prácticas | |
-| 8 | Ajustes sobre diseño original | 5,0% | No hay ajustes ni justificación | Cambios sin justificar | Ajustes coherentes | Mejora clara con justificación técnica (trade-offs) | |
-| 9 | Documentación técnica | 5,0% | Ausente o confusa | Incompleta | Clara y suficiente | Detallada, estructurada y profesional | |
-| | | **30,0%** | | | | | **0** |
-
----
-
-### Entrega Final + Defensa (45%)
-
-> **Enfoque:** producto final + comprensión + trabajo en equipo
-
-| Item | Criterio | Peso | Insuficiente (1) | Aceptable (2) | Bueno (3) | Excelente (4) | Calif. |
-|---|---|---|---|---|---|---|---|
-| 10 | Producto final | 15,0% | No cumple objetivos | Cumple parcialmente | Cumple objetivos | Supera objetivos y es consistente | |
-| 11 | Arquitectura final | 5,0% | Inconsistente o incorrecta | Básica | Adecuada | Robusta, escalable y bien fundamentada | |
-| 12 | Calidad global | 5,0% | Malas prácticas | Aceptable | Buenas prácticas | Muy buenas prácticas y calidad técnica | |
-| 13 | Documentación final | 5,0% | Deficiente | Básica | Clara | Completa, profesional y reutilizable | |
-| 14 | Innovación y valor agregado | 5,0% | Sin aporte | Aporte mínimo | Interesante | Solución innovadora y creativa | |
-| 15 | Trabajo en equipo | 5,0% | Desorganización | Organización básica | Buena colaboración | Excelente coordinación y uso de herramientas | |
-| 16 | Defensa individual | 5,0% | No comprende el sistema | Comprensión parcial | Explica correctamente | Domina el sistema y justifica decisiones | |
-| | | **45,0%** | | | | | **0** |
+| Item | Criterio | Peso |
+|---|---|---|
+| 5 | Implementación técnica | 9,0% |
+| 6 | Pipeline de datos (E2E) | 6,0% |
+| 7 | Calidad y performance | 5,0% |
+| 8 | Ajustes sobre diseño original | 5,0% |
+| 9 | Documentación técnica | 5,0% |
